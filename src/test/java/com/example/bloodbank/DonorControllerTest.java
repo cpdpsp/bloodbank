@@ -28,6 +28,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.example.bloodbank.controller.DonorController;
 import com.example.bloodbank.entity.Donor;
+import com.example.bloodbank.exception.GlobalExceptionHandler;
+import com.example.bloodbank.exception.InvalidBloodGroupException;
 import com.example.bloodbank.exception.InvalidDataException;
 import com.example.bloodbank.service.DonorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,7 +53,7 @@ public class DonorControllerTest {
     @BeforeEach
 	private void setup() {
 		MockitoAnnotations.initMocks(this);
-		mockMvc= MockMvcBuilders.standaloneSetup(donorController).build();
+		mockMvc= MockMvcBuilders.standaloneSetup(donorController).setControllerAdvice(new GlobalExceptionHandler()).build();
 	}
 		
 	@Test
@@ -94,7 +96,6 @@ public class DonorControllerTest {
 		String donor = objectMapper.writeValueAsString(donorToBeSent);
 
 		Long registrationDate = System.currentTimeMillis();
-//		donorToBeSent.setRegistrationDate(registrationDate);
 		Mockito.when(donorService.saveDonorDetails(Mockito.any())).thenReturn(donorToBeSent);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/addDonor").contentType(MediaType.APPLICATION_JSON).content(donor))
@@ -104,9 +105,18 @@ public class DonorControllerTest {
 	}
 	
 	@Test
+	public void whenPostDonorAndInvalidBloodGroup_thenThrowException() throws Exception{
+		Donor donorToBeSent = new Donor("sunidhi","pandey","Jamnagar","U-",System.currentTimeMillis(),"213qaz@qa.voqw");
+		Mockito.when(donorService.saveDonorDetails(Mockito.any())).thenThrow(new InvalidBloodGroupException());
+		
+		mockMvc.perform(MockMvcRequestBuilders.post("/addDonor")
+				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(donorToBeSent)))
+		.andExpect(MockMvcResultMatchers.status().is4xxClientError());
+		
+	}
+	
+	@Test
 	public void whenPutRequestToDonorAndValidDonor_thenCorrectResponse() throws Exception{
-
-		MediaType applicationJson = new MediaType(MediaType.APPLICATION_JSON);
 
 		Donor donorToBeSent = new Donor("sunidhi","pandey","Jamnagar","O-",System.currentTimeMillis(),"213qaz@qa.voqw");
 		Donor updatedDonor = new Donor("sun","pandey","Jamnagar","O+",System.currentTimeMillis(),"qaz@qa.voqw");
@@ -123,21 +133,7 @@ public class DonorControllerTest {
 		.andExpect(jsonPath("$.email",is(updatedDonor.getEmail())));
 	}
 
-//	@Test
-	public void whenPutRequestToDonorAndInValidDonor_thenCorrectResponse() throws Exception{
-
-		MediaType applicationJson = new MediaType(MediaType.APPLICATION_JSON);
-
-		Donor donorToBeSent = new Donor("sunidhi","pandey","Jamnagar","O-",System.currentTimeMillis(),"213qaz@qa.voqw");
-		donorToBeSent.setDonorId(UUID.randomUUID());
-//		Donor updatedDonor = new Donor("sun","pandey","Jamnagar","O+",System.currentTimeMillis(),"qaz@qa.voqw");
-
-		Mockito.when(donorService.updateDonor(Mockito.any(),Mockito.any())).thenThrow(new InvalidDataException("Invalid donor id"));
 		
-		mockMvc.perform(MockMvcRequestBuilders.put("/modifyDonor/{id}",UUID.randomUUID())
-		.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(donorToBeSent)))
-		;//.andExpect(MockMvcResultMatchers.status().isNotFound());//.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
-	}		
 	
 	@Test
 	public void whenGetDonorsForBloodGroupAndValidBloodGroup_thenCorrectResponse() throws Exception{
@@ -162,16 +158,21 @@ public class DonorControllerTest {
 	@Test
 	public void whenDeleteDonorAndValidDonor_thenCorrectResponse() throws Exception{
 	
-		Mockito.doNothing().when(donorService).deleteDonor(UUID.randomUUID());
-		mockMvc.perform(MockMvcRequestBuilders.delete("/deleteDonor/{id}",UUID.randomUUID())
-		.contentType(MediaType.APPLICATION_JSON))
+		Mockito.doNothing().when(donorService).deleteDonor(Mockito.any());
+		mockMvc.perform(MockMvcRequestBuilders.delete("/deleteDonor/{id}",UUID.randomUUID()))
 		.andExpect(MockMvcResultMatchers.status().isOk());
 	}
 	
 	@Test
+	public void whenDeleteDonorAndInvaldDonorId_thenThrowException() throws Exception{
+		Mockito.doThrow(new InvalidDataException("Enter a valid donor id.")).when(donorService).deleteDonor(Mockito.any());
+		
+		mockMvc.perform(MockMvcRequestBuilders.delete("/deleteDonor/{id}",UUID.randomUUID()))
+		.andExpect(MockMvcResultMatchers.status().is4xxClientError());
+	}
+	
+	@Test
 	public void whenPatchRequestToDonorAndValidDonor_thenCorrectResponse() throws Exception{
-
-		MediaType applicationJson = new MediaType(MediaType.APPLICATION_JSON);
 
 		Donor donorToBeSent = new Donor("sunidhi","pandey","Jamnagar","O-",System.currentTimeMillis(),"213qaz@qa.voqw");
 		Donor updatedDonor = new Donor("sun","pandey","Jamnagar","O+",System.currentTimeMillis(),"qaz@qa.voqw");
