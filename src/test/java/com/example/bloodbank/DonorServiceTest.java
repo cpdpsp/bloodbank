@@ -1,6 +1,7 @@
 package com.example.bloodbank;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,5 +57,18 @@ public class DonorServiceTest {
 				});
 		
 		Mockito.verify(donorRepository,Mockito.never()).save(Mockito.any());
+	}
+
+	@Test
+	public void whenFindById_thenReturnDonor() {
+		UUID donorId = UUID.randomUUID();
+		Donor donor = new Donor("sunidhi","pandey","Jamnagar","AB-",System.currentTimeMillis(),"213qaz@qa.voqw");
+		donor.setDonorId(donorId);
+		
+		Mockito.when(donorRepository.findById(donorId)).thenReturn(Optional.of(donor));
+		
+		Donor donorSaved = donorService.findById(donorId).get();
+		
+		Assertions.assertThat(donorSaved).isNotNull();
 	}
 }
