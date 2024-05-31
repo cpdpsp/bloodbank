@@ -26,7 +26,7 @@ public interface DonationRepository extends JpaRepository<Donation,UUID>{
 	List<Donation> getDonationForLastThreeMonths(Long currentTime);
 	
 	@Query(value="select count(*) from donation where donated_on between UNIX_TIMESTAMP(DATE_SUB(CURDATE(),INTERVAL 7 DAY))*1000 and (:currentTime) and donor_id=:donorId",nativeQuery=true)
-	int donationInLastSevenDays(String donorId,Long currentTime);
+	int numberOfDonationsMadeInLastSevenDays(String donorId,Long currentTime);
 	
 	@Transactional
 	@Modifying

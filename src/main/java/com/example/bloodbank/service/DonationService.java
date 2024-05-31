@@ -25,7 +25,7 @@ public class DonationService {
 		donation.setReusable(true);
 		donation.setDonatedOn(System.currentTimeMillis());
 		
-		if(donationRepository.donationInLastSevenDays(donation.getDonorId().toString(),System.currentTimeMillis())>0) {
+		if(donationRepository.numberOfDonationsMadeInLastSevenDays(donation.getDonorId().toString(),System.currentTimeMillis())>0) {
 			throw new ValidationException("Donation has been made in last 7 days.");
 		}
 		
