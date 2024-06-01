@@ -11,7 +11,7 @@ import com.example.bloodbank.entity.Donation;
 import com.example.bloodbank.exception.InvalidDataException;
 import com.example.bloodbank.exception.ValidationException;
 import com.example.bloodbank.repository.DonationRepository;
-import com.example.bloodbank.response.FetchUnitsAvailableResponse;
+import com.example.bloodbank.response.UnitsAvailableByBloodGroup;
 
 @Service
 public class DonationService {
@@ -38,7 +38,7 @@ public class DonationService {
 		return donationRepository.save(donation);
 	}
 
-	public List<FetchUnitsAvailableResponse> getUnitsAvailable() {
+	public List<UnitsAvailableByBloodGroup> getUnitsAvailable() {
 		return donationRepository.getUnitsAvailable();
 	}
 
@@ -55,6 +55,7 @@ public class DonationService {
 		donationRepository.deleteById(donationId);
 	}
 
+	// Get all the donations made within last three months.
 	public List<Donation> getDonationForLastThreeMonths() {
 		return donationRepository.getDonationForLastThreeMonths(System.currentTimeMillis());
 	}
@@ -65,8 +66,10 @@ public class DonationService {
 	}
 
 	// Check if the donation has valid donation ID and if the units donated are
-	// valid before updating the details.
-	public Donation checkUnitsDonated(UUID donationId, Donation donation) {
+	// valid before updating the details. In case someone wants to update only a few
+	// donation details, rest will
+	// still be preserved.
+	public Donation validateAndSaveDonation(UUID donationId, Donation donation) {
 		Donation oldDonation = findById(donationId)
 				.orElseThrow(() -> new InvalidDataException("Invalid donation id: " + donationId));
 
@@ -87,6 +90,7 @@ public class DonationService {
 	}
 
 	// Check if the donation has valid donation ID before updating the details.
+	// All the fields will be updated based on the data received.
 	public Donation updateDonation(UUID donationId, Donation donation) {
 		Donation oldDonation = findById(donationId)
 				.orElseThrow(() -> new InvalidDataException("Invalid donation id: " + donationId));

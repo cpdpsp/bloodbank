@@ -109,7 +109,7 @@ public class DonorServiceTest {
 				.thenThrow(new InvalidDataException("Invalid donor id: " + Mockito.any()));
 
 		Assertions.assertThrows(InvalidDataException.class, () -> {
-			donorService.patchDonor(donor.getDonorId(), donor);
+			donorService.validateAndSaveDonor(donor.getDonorId(), donor);
 		});
 
 		Mockito.verify(donorRepository, Mockito.never()).save(Mockito.any(Donor.class));
@@ -123,7 +123,7 @@ public class DonorServiceTest {
 		Mockito.when(donorRepository.findById(Mockito.any())).thenReturn(Optional.of(donor));
 
 		Mockito.when(donorRepository.save(Mockito.any())).thenReturn(updatedDonor);
-		Donor donorReceived = donorService.patchDonor(donor.getDonorId(), updatedDonor);
+		Donor donorReceived = donorService.validateAndSaveDonor(donor.getDonorId(), updatedDonor);
 
 		Assertions.assertEquals(updatedDonor, donorReceived);
 	}

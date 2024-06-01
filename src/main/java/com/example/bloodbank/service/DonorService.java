@@ -41,8 +41,9 @@ public class DonorService {
 	}
 
 	// Check if the donor has valid donor ID and blood group before updating the
-	// details.
-	public Donor patchDonor(UUID donorId, Donor donor) {
+	// details. In case someone wants to update only a few donor details, rest will
+	// still be preserved.
+	public Donor validateAndSaveDonor(UUID donorId, Donor donor) {
 
 		Donor oldDonor = findById(donorId).orElseThrow(() -> new InvalidDataException("Invalid donor id: " + donorId));
 
@@ -71,7 +72,7 @@ public class DonorService {
 	}
 
 	// Check if the donor has valid donor ID and blood group before updating the
-	// details.
+	// details. All the fields will be updated based on the data received.
 	public Donor updateDonor(UUID donorId, Donor donor) {
 		Donor oldDonor = findById(donorId).orElseThrow(() -> new InvalidDataException("Invalid donor id: " + donorId));
 

@@ -83,28 +83,6 @@ public class DonorControllerTest {
 	}
 
 	@Test
-	public void addDonorTestSentDonorReceivedDonorWithoutRegistrationDateTest() throws Exception {
-
-		MediaType applicationJson = new MediaType(MediaType.APPLICATION_JSON);
-		Donor donorToBeSent = new Donor();
-		donorToBeSent.setCity("Jamnagar");
-		donorToBeSent.setBloodGroup("O-");
-		donorToBeSent.setEmail("213qaz@qa.voqw");
-		donorToBeSent.setFirstName("sunidhi");
-		donorToBeSent.setLastName("pandey");
-
-		String donor = objectMapper.writeValueAsString(donorToBeSent);
-
-		Long registrationDate = System.currentTimeMillis();
-		Mockito.when(donorService.saveDonorDetails(Mockito.any())).thenReturn(donorToBeSent);
-
-		mockMvc.perform(MockMvcRequestBuilders.post("/addDonor").contentType(MediaType.APPLICATION_JSON).content(donor))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.content().contentType(applicationJson))
-				.andExpect(jsonPath("$", aMapWithSize(7))).andExpect(jsonPath("$.registrationDate").doesNotExist());
-	}
-
-	@Test
 	public void whenPostDonorAndInvalidBloodGroup_thenThrowException() throws Exception {
 		Donor donorToBeSent = new Donor("sunidhi", "pandey", "Jamnagar", "U-", System.currentTimeMillis(),
 				"213qaz@qa.voqw");
@@ -118,10 +96,9 @@ public class DonorControllerTest {
 
 	@Test
 	public void whenPutRequestToDonorAndValidDonor_thenCorrectResponse() throws Exception {
-
-		Donor donorToBeSent = new Donor("sunidhi", "pandey", "Jamnagar", "O-", System.currentTimeMillis(),
-				"213qaz@qa.voqw");
-		Donor updatedDonor = new Donor("sun", "pandey", "Jamnagar", "O+", System.currentTimeMillis(), "qaz@qa.voqw");
+		Long registrationDate = System.currentTimeMillis();
+		Donor donorToBeSent = new Donor("sunidhi", "pandey", "Jamnagar", "O-", registrationDate, "213qaz@qa.voqw");
+		Donor updatedDonor = new Donor("sun", "pandey", "Jamnagar", "O+", registrationDate, "qaz@qa.voqw");
 
 		Mockito.when(donorService.updateDonor(Mockito.any(), Mockito.any())).thenReturn(updatedDonor);
 		mockMvc.perform(MockMvcRequestBuilders.put("/modifyDonor/{id}", UUID.randomUUID())
@@ -132,7 +109,7 @@ public class DonorControllerTest {
 				.andExpect(jsonPath("$.lastName", is(updatedDonor.getLastName())))
 				.andExpect(jsonPath("$.city", is(updatedDonor.getCity())))
 				.andExpect(jsonPath("$.bloodGroup", is(updatedDonor.getBloodGroup())))
-				.andExpect(jsonPath("$.registrationDate", is(updatedDonor.getRegistrationDate())))
+				.andExpect(jsonPath("$.registrationDate", is(registrationDate)))
 				.andExpect(jsonPath("$.email", is(updatedDonor.getEmail())));
 	}
 
@@ -175,12 +152,11 @@ public class DonorControllerTest {
 
 	@Test
 	public void whenPatchRequestToDonorAndValidDonor_thenCorrectResponse() throws Exception {
+		Long registrationDate = System.currentTimeMillis();
+		Donor donorToBeSent = new Donor("sunidhi", "pandey", "Jamnagar", "O-", registrationDate, "213qaz@qa.voqw");
+		Donor updatedDonor = new Donor("sun", "pandey", "Jamnagar", "O+", registrationDate, "qaz@qa.voqw");
 
-		Donor donorToBeSent = new Donor("sunidhi", "pandey", "Jamnagar", "O-", System.currentTimeMillis(),
-				"213qaz@qa.voqw");
-		Donor updatedDonor = new Donor("sun", "pandey", "Jamnagar", "O+", System.currentTimeMillis(), "qaz@qa.voqw");
-
-		Mockito.when(donorService.patchDonor(Mockito.any(), Mockito.any())).thenReturn(updatedDonor);
+		Mockito.when(donorService.validateAndSaveDonor(Mockito.any(), Mockito.any())).thenReturn(updatedDonor);
 
 		mockMvc.perform(MockMvcRequestBuilders.patch("/modifyDonor/{id}", UUID.randomUUID())
 				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(donorToBeSent)))
@@ -190,7 +166,7 @@ public class DonorControllerTest {
 				.andExpect(jsonPath("$.lastName", is(updatedDonor.getLastName())))
 				.andExpect(jsonPath("$.city", is(updatedDonor.getCity())))
 				.andExpect(jsonPath("$.bloodGroup", is(updatedDonor.getBloodGroup())))
-				.andExpect(jsonPath("$.registrationDate", is(updatedDonor.getRegistrationDate())))
+				.andExpect(jsonPath("$.registrationDate", is(registrationDate)))
 				.andExpect(jsonPath("$.email", is(updatedDonor.getEmail())));
 	}
 

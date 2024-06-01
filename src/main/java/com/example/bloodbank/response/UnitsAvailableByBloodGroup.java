@@ -1,6 +1,6 @@
 package com.example.bloodbank.response;
 
-public interface FetchUnitsAvailableResponse {
+public interface UnitsAvailableByBloodGroup {
 
 	int getUnitsDonated();
 

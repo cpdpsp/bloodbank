@@ -20,7 +20,7 @@ import com.example.bloodbank.entity.Donation;
 import com.example.bloodbank.exception.InvalidDataException;
 import com.example.bloodbank.exception.ValidationException;
 import com.example.bloodbank.repository.DonationRepository;
-import com.example.bloodbank.response.FetchUnitsAvailableResponse;
+import com.example.bloodbank.response.UnitsAvailableByBloodGroup;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -63,8 +63,8 @@ public class DonationServiceTest {
 
 	@Test
 	public void whenGetUnitsAvailable_thenCorrectResponse() {
-		List<FetchUnitsAvailableResponse> unitsAvailableList = new ArrayList<>();
-		FetchUnitsAvailableResponse unitsAvailable = new FetchUnitsAvailableResponse() {
+		List<UnitsAvailableByBloodGroup> unitsAvailableList = new ArrayList<>();
+		UnitsAvailableByBloodGroup unitsAvailable = new UnitsAvailableByBloodGroup() {
 
 			@Override
 			public int getUnitsDonated() {
@@ -83,7 +83,7 @@ public class DonationServiceTest {
 
 		Mockito.when(donationRepository.getUnitsAvailable()).thenReturn(unitsAvailableList);
 
-		List<FetchUnitsAvailableResponse> unitsAvailableReceived = donationService.getUnitsAvailable();
+		List<UnitsAvailableByBloodGroup> unitsAvailableReceived = donationService.getUnitsAvailable();
 
 		Assertions.assertEquals(unitsAvailableList.size(), unitsAvailableReceived.size());
 		Assertions.assertEquals(unitsAvailableList.get(0).getUnitsDonated(),
@@ -167,7 +167,7 @@ public class DonationServiceTest {
 		Mockito.when(donationRepository.findById(Mockito.any())).thenReturn(Optional.of(donation));
 		Mockito.when(donationRepository.save(Mockito.any())).thenReturn(updatedDonation);
 
-		Donation donationReceived = donationService.checkUnitsDonated(donation.getDonationId(), updatedDonation);
+		Donation donationReceived = donationService.validateAndSaveDonation(donation.getDonationId(), updatedDonation);
 		Assertions.assertEquals(updatedDonation, donationReceived);
 	}
 
@@ -177,7 +177,7 @@ public class DonationServiceTest {
 				.thenThrow(new InvalidDataException("Invalid donation id: " + donation.getDonationId()));
 
 		Assertions.assertThrows(InvalidDataException.class,
-				() -> donationService.checkUnitsDonated(donation.getDonationId(), donation));
+				() -> donationService.validateAndSaveDonation(donation.getDonationId(), donation));
 
 		Mockito.verify(donationRepository, Mockito.never()).save(donation);
 	}
@@ -188,7 +188,7 @@ public class DonationServiceTest {
 		Mockito.when(donationRepository.findById(Mockito.any())).thenReturn(Optional.of(donation));
 
 		Assertions.assertThrows(ValidationException.class,
-				() -> donationService.checkUnitsDonated(Mockito.any(), updatedDonation));
+				() -> donationService.validateAndSaveDonation(Mockito.any(), updatedDonation));
 
 		Mockito.verify(donationRepository, Mockito.never()).save(updatedDonation);
 	}

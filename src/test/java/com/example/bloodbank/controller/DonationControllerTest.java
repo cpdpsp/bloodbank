@@ -31,7 +31,7 @@ import com.example.bloodbank.entity.Donation;
 import com.example.bloodbank.exception.GlobalExceptionHandler;
 import com.example.bloodbank.exception.InvalidDataException;
 import com.example.bloodbank.exception.ValidationException;
-import com.example.bloodbank.response.FetchUnitsAvailableResponse;
+import com.example.bloodbank.response.UnitsAvailableByBloodGroup;
 import com.example.bloodbank.service.DonationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -87,8 +87,8 @@ public class DonationControllerTest {
 	@Test
 	public void whenGetUnitsAvailable_thenCorrectResponse() throws Exception {
 
-		List<FetchUnitsAvailableResponse> unitsList = new ArrayList<>();
-		FetchUnitsAvailableResponse unitsAvailable1 = new FetchUnitsAvailableResponse() {
+		List<UnitsAvailableByBloodGroup> unitsList = new ArrayList<>();
+		UnitsAvailableByBloodGroup unitsAvailable1 = new UnitsAvailableByBloodGroup() {
 
 			@Override
 			public int getUnitsDonated() {
@@ -103,7 +103,7 @@ public class DonationControllerTest {
 			}
 		};
 
-		FetchUnitsAvailableResponse unitsAvailable2 = new FetchUnitsAvailableResponse() {
+		UnitsAvailableByBloodGroup unitsAvailable2 = new UnitsAvailableByBloodGroup() {
 
 			@Override
 			public int getUnitsDonated() {
@@ -154,9 +154,10 @@ public class DonationControllerTest {
 	@Test
 	public void whenPutDonationAndValidDonation_thenCorrectResponse() throws Exception {
 		UUID donationId = UUID.randomUUID();
-		Donation donation = new Donation(1f, UUID.randomUUID(), true, System.currentTimeMillis());
+		Long donatedOn = System.currentTimeMillis();
+		Donation donation = new Donation(1f, UUID.randomUUID(), true, donatedOn);
 		donation.setDonationId(donationId);
-		Donation modifiedDonation = new Donation(2f, UUID.randomUUID(), false, System.currentTimeMillis());
+		Donation modifiedDonation = new Donation(2f, UUID.randomUUID(), false, donatedOn);
 		modifiedDonation.setDonationId(donationId);
 
 		Mockito.when(donationService.updateDonation(Mockito.any(), Mockito.any())).thenReturn(modifiedDonation);
@@ -166,7 +167,7 @@ public class DonationControllerTest {
 				.andExpect(jsonPath("$", aMapWithSize(5)))
 				.andExpect(jsonPath("$.unitsDonated").value(modifiedDonation.getUnitsDonated()))
 				.andExpect(jsonPath("$.donorId", equalTo(modifiedDonation.getDonorId().toString())))
-				.andExpect(jsonPath("$.donatedOn", is(modifiedDonation.getDonatedOn())))
+				.andExpect(jsonPath("$.donatedOn", is(donatedOn)))
 				.andExpect(jsonPath("$.reusable", is(modifiedDonation.isReusable())));
 	}
 
@@ -192,8 +193,9 @@ public class DonationControllerTest {
 
 	@Test
 	public void whenGetDonationForLastThreeMonths_thenCorrectResponse() throws Exception {
-		Donation donation1 = new Donation(1f, UUID.randomUUID(), true, System.currentTimeMillis());
-		Donation donation2 = new Donation(2f, UUID.randomUUID(), true, System.currentTimeMillis());
+		Long donatedOn = System.currentTimeMillis();
+		Donation donation1 = new Donation(1f, UUID.randomUUID(), true, donatedOn);
+		Donation donation2 = new Donation(2f, UUID.randomUUID(), true, donatedOn);
 
 		List<Donation> donationList = new ArrayList<>();
 		donationList.add(donation1);
@@ -203,23 +205,25 @@ public class DonationControllerTest {
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/getDonationForLastThreeMonths"))
 				.andExpect(jsonPath("$", hasSize(2))).andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(jsonPath("$[0].donatedOn", is(donation1.getDonatedOn())))
-				.andExpect(jsonPath("$[1].donatedOn", is(donation2.getDonatedOn())));
+				.andExpect(jsonPath("$[0].donatedOn", is(donatedOn)))
+				.andExpect(jsonPath("$[1].donatedOn", is(donatedOn)));
 	}
 
 	@Test
 	public void whenPatchDonationAndValidDonation_thenCorrectResponse() throws Exception {
-		Donation donation = new Donation(1f, UUID.randomUUID(), true, System.currentTimeMillis());
-		Donation modifiedDonation = new Donation(2f, UUID.randomUUID(), false, System.currentTimeMillis());
+		Long donatedOn = System.currentTimeMillis();
+		Donation donation = new Donation(1f, UUID.randomUUID(), true, donatedOn);
+		Donation modifiedDonation = new Donation(2f, UUID.randomUUID(), false, donatedOn);
 
-		Mockito.when(donationService.checkUnitsDonated(Mockito.any(), Mockito.any())).thenReturn(modifiedDonation);
+		Mockito.when(donationService.validateAndSaveDonation(Mockito.any(), Mockito.any()))
+				.thenReturn(modifiedDonation);
 
 		mockMvc.perform(MockMvcRequestBuilders.patch("/modifyDonation/{id}", UUID.randomUUID())
 				.content(objectMapper.writeValueAsString(donation)).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$", aMapWithSize(5)))
 				.andExpect(jsonPath("$.unitsDonated").value(modifiedDonation.getUnitsDonated()))
 				.andExpect(jsonPath("$.donorId", equalTo(modifiedDonation.getDonorId().toString())))
-				.andExpect(jsonPath("$.donatedOn", is(modifiedDonation.getDonatedOn())))
+				.andExpect(jsonPath("$.donatedOn", is(donatedOn)))
 				.andExpect(jsonPath("$.reusable", is(modifiedDonation.isReusable())));
 	}
 }

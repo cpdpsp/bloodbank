@@ -50,10 +50,9 @@ public class DonorController {
 	}
 
 	@PatchMapping("/modifyDonor/{id}")
-	public ResponseEntity<Donor> patchDonor(@PathVariable("id") UUID donorId,
-			@RequestBody Donor donor) {
-		Donor donorSaved = donorService.patchDonor(donorId, donor);
-		return ResponseEntity.ok(donorSaved);
+	public ResponseEntity<Donor> patchDonor(@PathVariable("id") UUID donorId, @RequestBody Donor donor) {
+		Donor donorSaved = donorService.validateAndSaveDonor(donorId, donor);
+		return new ResponseEntity<>(donorSaved, HttpStatus.OK);
 	}
 
 }

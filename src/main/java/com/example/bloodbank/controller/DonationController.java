@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bloodbank.entity.Donation;
-import com.example.bloodbank.response.FetchUnitsAvailableResponse;
+import com.example.bloodbank.response.UnitsAvailableByBloodGroup;
 import com.example.bloodbank.service.DonationService;
 
 import jakarta.validation.Valid;
@@ -34,8 +34,8 @@ public class DonationController {
 	}
 
 	@GetMapping("/getUnitsAvailable")
-	public ResponseEntity<List<FetchUnitsAvailableResponse>> getUnitsAvailable() {
-		List<FetchUnitsAvailableResponse> unitsAvailableList = donationService.getUnitsAvailable();
+	public ResponseEntity<List<UnitsAvailableByBloodGroup>> getUnitsAvailable() {
+		List<UnitsAvailableByBloodGroup> unitsAvailableList = donationService.getUnitsAvailable();
 		return new ResponseEntity<>(unitsAvailableList, HttpStatus.OK);
 	}
 
@@ -67,7 +67,7 @@ public class DonationController {
 	@PatchMapping("/modifyDonation/{id}")
 	public ResponseEntity<Donation> patchDonation(@PathVariable(value = "id") UUID donationId,
 			@RequestBody Donation donation) {
-		Donation donationSaved = donationService.checkUnitsDonated(donationId, donation);
+		Donation donationSaved = donationService.validateAndSaveDonation(donationId, donation);
 		return new ResponseEntity<>(donationSaved, HttpStatus.OK);
 	}
 }

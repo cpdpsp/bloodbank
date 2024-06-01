@@ -10,14 +10,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.bloodbank.entity.Donation;
-import com.example.bloodbank.response.FetchUnitsAvailableResponse;
+import com.example.bloodbank.response.UnitsAvailableByBloodGroup;
 
 @Repository
 public interface DonationRepository extends JpaRepository<Donation, UUID> {
 
 	@Query(value = "Select blood_group as bloodGroup,sum(units_donated) as unitsDonated from donation JOIN donor"
 			+ " on donor.donor_id = donation.donor_id group by donor.blood_group;", nativeQuery = true)
-	List<FetchUnitsAvailableResponse> getUnitsAvailable();
+	List<UnitsAvailableByBloodGroup> getUnitsAvailable();
 
 	@Query(value = "Select * from donation where donor_id=:donorId", nativeQuery = true)
 	List<Donation> findAllByDonorId(String donorId);
