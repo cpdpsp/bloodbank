@@ -11,9 +11,9 @@ public class ScheduledTask {
 
 	@Autowired
 	private ScheduledTaskService scheduledService;
-	
-	@Scheduled(cron = "0 * * * * *")// Cron expression for running every minute
-    public void execute() {
+
+	@Scheduled(cron = "0 * * * * *") // Cron expression for running every minute
+	public void execute() {
 		scheduledService.updateReusability();
-    }
+	}
 }

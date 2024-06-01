@@ -10,7 +10,8 @@ public class ScheduledTaskService {
 
 	@Autowired
 	private DonationService donationService;
-	
+
+	// Update the reusable status if the blood was donated more than one month ago.
 	public void updateReusability() {
 		System.out.println("Scheduled task executed at: " + new Date());
 		donationService.updateBloodReusability();

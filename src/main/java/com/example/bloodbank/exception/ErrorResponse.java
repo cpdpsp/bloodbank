@@ -1,11 +1,11 @@
-package com.example.bloodbank.utils;
+package com.example.bloodbank.exception;
 
 public class ErrorResponse {
 
 	private int statusCode;
 	private String message;
-	
-	public ErrorResponse(int code,String message){
+
+	public ErrorResponse(int code, String message) {
 		statusCode = code;
 		this.message = message;
 	}
@@ -17,5 +17,5 @@ public class ErrorResponse {
 	public String getMessage() {
 		return message;
 	}
-	
+
 }

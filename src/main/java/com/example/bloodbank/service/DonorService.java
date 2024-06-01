@@ -6,8 +6,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.bloodbank.entity.Donor;
@@ -21,69 +19,71 @@ public class DonorService {
 
 	@Autowired
 	private DonorRepository donorRepository;
-	
+
+	// Check if the donor has valid blood group before saving.
 	public Donor saveDonorDetails(Donor donor) {
 		donor.setRegistrationDate(System.currentTimeMillis());
 		validateBloodGroup(donor);
 		return donorRepository.save(donor);
 	}
-	
+
 	public Optional<Donor> findById(UUID donorId) {
 		return donorRepository.findById(donorId);
 	}
-	
-	public List<Donor> getDonorWithBloodGroup(String bloodGroup){
+
+	public List<Donor> getDonorWithBloodGroup(String bloodGroup) {
 		return donorRepository.findByBloodGroup(bloodGroup);
 	}
-	
+
 	public void deleteDonor(UUID donorId) {
-		findById(donorId).orElseThrow(()-> new InvalidDataException("Enter a valid donor id."));
+		findById(donorId).orElseThrow(() -> new InvalidDataException("Enter a valid donor id."));
 		donorRepository.deleteById(donorId);
 	}
-	
-	public Donor patchDonor(UUID donorId,Donor donor) {
-		
-		Donor oldDonor = findById(donorId)
-				.orElseThrow(()->new InvalidDataException("Invalid donor id: "+donorId));
-		
-		if(donor.getFirstName()!=null)
+
+	// Check if the donor has valid donor ID and blood group before updating the
+	// details.
+	public Donor patchDonor(UUID donorId, Donor donor) {
+
+		Donor oldDonor = findById(donorId).orElseThrow(() -> new InvalidDataException("Invalid donor id: " + donorId));
+
+		if (donor.getFirstName() != null)
 			oldDonor.setFirstName(donor.getFirstName());
-		if(donor.getLastName()!=null)
+		if (donor.getLastName() != null)
 			oldDonor.setLastName(donor.getLastName());
-		if(donor.getEmail()!=null)
+		if (donor.getEmail() != null)
 			oldDonor.setEmail(donor.getEmail());
-		if(donor.getBloodGroup()!=null)
+		if (donor.getBloodGroup() != null)
 			oldDonor.setBloodGroup(donor.getBloodGroup());
-		if(donor.getRegistrationDate()!=null)
+		if (donor.getRegistrationDate() != null)
 			oldDonor.setRegistrationDate(donor.getRegistrationDate());
-		if(donor.getCity()!=null)
+		if (donor.getCity() != null)
 			oldDonor.setCity(donor.getCity());
 		validateBloodGroup(donor);
 		return donorRepository.save(oldDonor);
 	}
-	
+
 	private void validateBloodGroup(Donor donor) {
 		Optional<BloodGroup> bloodGroup = Stream.of(BloodGroup.values())
-				.filter(c->c.toString().equals(donor.getBloodGroup()))
-				.findFirst();
-				if(bloodGroup.isEmpty()) {
-					throw new InvalidBloodGroupException();
-				}
+				.filter(c -> c.toString().equals(donor.getBloodGroup())).findFirst();
+		if (bloodGroup.isEmpty()) {
+			throw new InvalidBloodGroupException();
+		}
 	}
-	
+
+	// Check if the donor has valid donor ID and blood group before updating the
+	// details.
 	public Donor updateDonor(UUID donorId, Donor donor) {
-		Donor oldDonor = findById(donorId)
-                .orElseThrow(() -> new InvalidDataException("Invalid donor id: " + donorId));
-		
+		Donor oldDonor = findById(donorId).orElseThrow(() -> new InvalidDataException("Invalid donor id: " + donorId));
+
 		oldDonor.setBloodGroup(donor.getBloodGroup());
 		oldDonor.setCity(donor.getCity());
 		oldDonor.setFirstName(donor.getFirstName());
 		oldDonor.setLastName(donor.getLastName());
 		oldDonor.setEmail(donor.getEmail());
 		oldDonor.setRegistrationDate(donor.getRegistrationDate());
-		
+
 		validateBloodGroup(oldDonor);
 		return donorRepository.save(oldDonor);
-		
+
 	}
 }

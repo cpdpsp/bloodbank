@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bloodbank.entity.Donation;
-import com.example.bloodbank.exception.ValidationException;
 import com.example.bloodbank.response.FetchUnitsAvailableResponse;
 import com.example.bloodbank.service.DonationService;
 
@@ -35,40 +34,40 @@ public class DonationController {
 	}
 
 	@GetMapping("/getUnitsAvailable")
-	public List<FetchUnitsAvailableResponse> getUnitsAvailable() {
-		return donationService.getUnitsAvailable();
+	public ResponseEntity<List<FetchUnitsAvailableResponse>> getUnitsAvailable() {
+		List<FetchUnitsAvailableResponse> unitsAvailableList = donationService.getUnitsAvailable();
+		return new ResponseEntity<>(unitsAvailableList, HttpStatus.OK);
 	}
 
 	@GetMapping("/getBloodDonated/{id}")
-	public List<Donation> getBloodDonated(@PathVariable(value = "id") String donorId) {
-		return donationService.getBloodDonated(donorId);
+	public ResponseEntity<List<Donation>> getBloodDonated(@PathVariable(value = "id") String donorId) {
+		List<Donation> donationList = donationService.getBloodDonated(donorId);
+		return new ResponseEntity<>(donationList, HttpStatus.OK);
 	}
 
 	@PutMapping("/modifyDonation/{id}")
 	public ResponseEntity<Donation> modifyDonationDetails(@PathVariable(value = "id") UUID donationId,
 			@Valid @RequestBody Donation donation) {
-		Donation donationSaved = donationService.updateDonation(donationId,donation);
-
-		return ResponseEntity.ok(donationSaved);
+		Donation donationSaved = donationService.updateDonation(donationId, donation);
+		return new ResponseEntity<>(donationSaved, HttpStatus.OK);
 	}
 
-	@DeleteMapping("deleteDonation/{id}")
+	@DeleteMapping("/deleteDonation/{id}")
 	public ResponseEntity<String> deleteDonation(@PathVariable("id") UUID donationId) {
 		donationService.deleteDonation(donationId);
 		return new ResponseEntity<>("Donation deleted successfully.", HttpStatus.OK);
 	}
 
-	@GetMapping("getDonationForLastThreeMonths")
-	List<Donation> getDonationForLastThreeMonths() {
-		return donationService.getDonationForLastThreeMonths();
+	@GetMapping("/getDonationForLastThreeMonths")
+	public ResponseEntity<List<Donation>> getDonationForLastThreeMonths() {
+		List<Donation> donationList = donationService.getDonationForLastThreeMonths();
+		return new ResponseEntity<>(donationList, HttpStatus.OK);
 	}
 
-	
-	@PatchMapping("partialModificationDonation/{id}")
-	public ResponseEntity<Donation> partialModificationDonation(
-	@PathVariable(value="id") UUID donationId, @RequestBody Donation donation) { 
-	  Donation donationSaved = donationService.checkUnitsDonated(donationId,donation);
-	  return ResponseEntity.ok(donationSaved); 
-	  }
-	 
+	@PatchMapping("/modifyDonation/{id}")
+	public ResponseEntity<Donation> patchDonation(@PathVariable(value = "id") UUID donationId,
+			@RequestBody Donation donation) {
+		Donation donationSaved = donationService.checkUnitsDonated(donationId, donation);
+		return new ResponseEntity<>(donationSaved, HttpStatus.OK);
+	}
 }

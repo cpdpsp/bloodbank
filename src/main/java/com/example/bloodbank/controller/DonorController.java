@@ -14,11 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.bloodbank.entity.Donor;
-import com.example.bloodbank.exception.ValidationException;
 import com.example.bloodbank.service.DonorService;
 
 @RestController
@@ -26,35 +24,36 @@ public class DonorController {
 
 	@Autowired
 	private DonorService donorService;
-	
-	@PostMapping(value="/addDonor",produces=MediaType.APPLICATION_JSON_VALUE)
+
+	@PostMapping(value = "/addDonor", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Donor> addDonor(@RequestBody Donor donor) {
-		Donor donorSaved  = donorService.saveDonorDetails(donor);
+		Donor donorSaved = donorService.saveDonorDetails(donor);
 		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(donorSaved);
 	}
-	
+
 	@PutMapping("/modifyDonor/{id}")
-	public ResponseEntity<Donor> modifyDonorDetails(
-			@PathVariable(value="id") UUID donorId, @RequestBody Donor donor){
-		Donor donorSaved = donorService.updateDonor(donorId,donor);
-        return ResponseEntity.ok(donorSaved);
+	public ResponseEntity<Donor> modifyDonorDetails(@PathVariable(value = "id") UUID donorId,
+			@RequestBody Donor donor) {
+		Donor donorSaved = donorService.updateDonor(donorId, donor);
+		return ResponseEntity.ok(donorSaved);
 	}
-	
-	@GetMapping("getDonors/{bloodGroup}")
+
+	@GetMapping("/getDonors/{bloodGroup}")
 	public List<Donor> getDonors(@PathVariable("bloodGroup") String bloodGroup) {
 		return donorService.getDonorWithBloodGroup(bloodGroup);
 	}
-	
-	@DeleteMapping("deleteDonor/{id}")
-	public ResponseEntity<String> deleteDonor(@PathVariable("id") UUID donorId){	
+
+	@DeleteMapping("/deleteDonor/{id}")
+	public ResponseEntity<String> deleteDonor(@PathVariable("id") UUID donorId) {
 		donorService.deleteDonor(donorId);
-		return new ResponseEntity<>("Donor deleted successfully.",HttpStatus.OK);
+		return new ResponseEntity<>("Donor deleted successfully.", HttpStatus.OK);
 	}
-	
-	@PatchMapping("partialModificationDonor/{id}")
-	public ResponseEntity<Donor> partialModificationDonation(@PathVariable("id") UUID donorId, @RequestBody Donor donor){
-		Donor donorSaved = donorService.patchDonor(donorId,donor);
+
+	@PatchMapping("/modifyDonor/{id}")
+	public ResponseEntity<Donor> patchDonor(@PathVariable("id") UUID donorId,
+			@RequestBody Donor donor) {
+		Donor donorSaved = donorService.patchDonor(donorId, donor);
 		return ResponseEntity.ok(donorSaved);
 	}
-	
+
 }
