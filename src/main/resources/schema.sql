@@ -12,7 +12,7 @@ create table IF NOT EXISTS donation (donation_id varchar(255) not null,
 donated_on datetime(6) not null,
 units_donated float(23) not null,
 donor_id varchar(255),
-reusable boolean,
+can_use boolean,
 primary key (donation_id),
 FOREIGN KEY (donor_id) references donor(donor_id)
 on delete cascade);

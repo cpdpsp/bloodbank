@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.example.bloodbank.entity.Donor;
 import com.example.bloodbank.exception.InvalidBloodGroupException;
 import com.example.bloodbank.exception.InvalidDataException;
+import com.example.bloodbank.exception.ValidationException;
 import com.example.bloodbank.repository.DonorRepository;
 import com.example.bloodbank.utils.BloodGroup;
 
@@ -53,13 +54,14 @@ public class DonorService {
 			oldDonor.setLastName(donor.getLastName());
 		if (donor.getEmail() != null)
 			oldDonor.setEmail(donor.getEmail());
-		if (donor.getBloodGroup() != null)
+		if (donor.getBloodGroup() != null) {
+			validateBloodGroup(donor);
 			oldDonor.setBloodGroup(donor.getBloodGroup());
+		}
 		if (donor.getRegistrationDate() != null)
 			oldDonor.setRegistrationDate(donor.getRegistrationDate());
 		if (donor.getCity() != null)
 			oldDonor.setCity(donor.getCity());
-		validateBloodGroup(donor);
 		return donorRepository.save(oldDonor);
 	}
 
@@ -75,6 +77,9 @@ public class DonorService {
 	// details. All the fields will be updated based on the data received.
 	public Donor updateDonor(UUID donorId, Donor donor) {
 		Donor oldDonor = findById(donorId).orElseThrow(() -> new InvalidDataException("Invalid donor id: " + donorId));
+
+		if (donor.getRegistrationDate() == null)
+			throw new ValidationException("Please provide all the details necessary to successfully update the donor.");
 
 		oldDonor.setBloodGroup(donor.getBloodGroup());
 		oldDonor.setCity(donor.getCity());

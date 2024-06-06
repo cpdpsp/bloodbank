@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.bloodbank.entity.Donor;
 import com.example.bloodbank.service.DonorService;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class DonorController {
 
@@ -26,21 +28,22 @@ public class DonorController {
 	private DonorService donorService;
 
 	@PostMapping(value = "/addDonor", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Donor> addDonor(@RequestBody Donor donor) {
+	public ResponseEntity<Donor> addDonor(@RequestBody @Valid Donor donor) {
 		Donor donorSaved = donorService.saveDonorDetails(donor);
 		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(donorSaved);
 	}
 
 	@PutMapping("/modifyDonor/{id}")
 	public ResponseEntity<Donor> modifyDonorDetails(@PathVariable(value = "id") UUID donorId,
-			@RequestBody Donor donor) {
+			@RequestBody @Valid Donor donor) {
 		Donor donorSaved = donorService.updateDonor(donorId, donor);
-		return ResponseEntity.ok(donorSaved);
+		return new ResponseEntity<>(donorSaved, HttpStatus.OK);
 	}
 
 	@GetMapping("/getDonors/{bloodGroup}")
-	public List<Donor> getDonors(@PathVariable("bloodGroup") String bloodGroup) {
-		return donorService.getDonorWithBloodGroup(bloodGroup);
+	public ResponseEntity<List<Donor>> getDonors(@PathVariable("bloodGroup") String bloodGroup) {
+		List<Donor> donorList = donorService.getDonorWithBloodGroup(bloodGroup);
+		return new ResponseEntity<>(donorList, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/deleteDonor/{id}")
@@ -50,7 +53,7 @@ public class DonorController {
 	}
 
 	@PatchMapping("/modifyDonor/{id}")
-	public ResponseEntity<Donor> patchDonor(@PathVariable("id") UUID donorId, @RequestBody Donor donor) {
+	public ResponseEntity<Donor> updateDonor(@PathVariable("id") UUID donorId, @RequestBody Donor donor) {
 		Donor donorSaved = donorService.validateAndSaveDonor(donorId, donor);
 		return new ResponseEntity<>(donorSaved, HttpStatus.OK);
 	}

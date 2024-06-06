@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 public class Donor {
@@ -21,21 +22,26 @@ public class Donor {
 	@JdbcTypeCode(Types.VARCHAR)
 	private UUID donorId;
 
+	@NotBlank(message = "Please enter a valid first name.")
 	@Column(name = "first_name")
 	private String firstName;
 
+	@NotBlank(message = "Please enter a valid last name.")
 	@Column(name = "last_name")
 	private String lastName;
 
+	@NotBlank(message = "Please enter a valid city.")
 	@Column(name = "city")
 	private String city;
 
+	@NotBlank(message = "Please enter a valid blood group.")
 	@Column(name = "blood_group")
 	private String bloodGroup;
 
 	@Column(name = "registration_date")
 	private Long registrationDate;
 
+	@NotBlank(message = "Please enter a valid email.")
 	@Column(name = "email")
 	private String email;
 

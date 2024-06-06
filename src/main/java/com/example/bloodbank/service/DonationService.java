@@ -22,7 +22,7 @@ public class DonationService {
 	// Save donation details if the donor has not made a donation in the last 7
 	// days.
 	public Donation lastDonationMade(Donation donation) {
-		donation.setReusable(true);
+		donation.setCanUse(true);
 		donation.setDonatedOn(System.currentTimeMillis());
 
 		if (donationRepository.getNumberOfDonationsMadeInLastSevenDays(donation.getDonorId().toString(),
@@ -79,8 +79,8 @@ public class DonationService {
 			oldDonation.setDonorId(donation.getDonorId());
 		if (donation.getUnitsDonated() != null)
 			oldDonation.setUnitsDonated(donation.getUnitsDonated());
-		if (donation.isReusable() != null)
-			oldDonation.setReusable(donation.isReusable());
+		if (donation.getCanUse() != null)
+			oldDonation.setCanUse(donation.getCanUse());
 		if (oldDonation.getUnitsDonated() < 1)
 			throw new ValidationException("Blood donated should not be less than 1 unit.");
 		else if (oldDonation.getUnitsDonated() > 3)
@@ -94,11 +94,14 @@ public class DonationService {
 	public Donation updateDonation(UUID donationId, Donation donation) {
 		Donation oldDonation = findById(donationId)
 				.orElseThrow(() -> new InvalidDataException("Invalid donation id: " + donationId));
+		if (donation.getCanUse() == null || donation.getDonatedOn() == null)
+			throw new ValidationException(
+					"Please provide all the details necessary to successfully update the donation.");
 
 		oldDonation.setDonatedOn(donation.getDonatedOn());
 		oldDonation.setDonorId(donation.getDonorId());
 		oldDonation.setUnitsDonated(donation.getUnitsDonated());
-		oldDonation.setReusable(donation.isReusable());
+		oldDonation.setCanUse(donation.getCanUse());
 		return saveDonationDetails(oldDonation);
 	}
 }

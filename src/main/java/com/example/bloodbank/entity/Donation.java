@@ -31,6 +31,7 @@ public class Donation {
 
 	@Min(value = 1, message = "Blood donated should not be less than 1 unit.")
 	@Max(value = 3, message = "Blood donated should not be more than 3 units.")
+	@NotNull(message = "Please enter valid units of blood donated.")
 	@Column(name = "units_donated")
 	private Float unitsDonated;
 
@@ -40,15 +41,15 @@ public class Donation {
 	private UUID donorId;
 
 	// Blood is not usable after one month from the donation date.
-	@Column(name = "reusable")
-	private Boolean reusable;
+	@Column(name = "can_use")
+	private Boolean canUse;
 
-	public Boolean isReusable() {
-		return reusable;
+	public Boolean getCanUse() {
+		return canUse;
 	}
 
-	public void setReusable(Boolean reusable) {
-		this.reusable = reusable;
+	public void setCanUse(Boolean canUse) {
+		this.canUse = canUse;
 	}
 
 	public UUID getDonationId() {
@@ -75,11 +76,11 @@ public class Donation {
 		this.unitsDonated = unitsDonated;
 	}
 
-	public Donation(Float unitsDonated, UUID donorId, boolean reusable) {
+	public Donation(Float unitsDonated, UUID donorId, boolean canUse) {
 		super();
 		this.unitsDonated = unitsDonated;
 		this.donorId = donorId;
-		this.reusable = reusable;
+		this.canUse = canUse;
 	}
 
 	public UUID getDonorId() {
@@ -94,17 +95,17 @@ public class Donation {
 
 	}
 
-	public Donation(Float unitsDonated, UUID donorId, boolean reusable, Long donatedOn) {
+	public Donation(Float unitsDonated, UUID donorId, boolean canUse, Long donatedOn) {
 		super();
 		this.unitsDonated = unitsDonated;
 		this.donorId = donorId;
-		this.reusable = reusable;
+		this.canUse = canUse;
 		this.donatedOn = donatedOn;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(donatedOn, donationId, donorId, reusable, unitsDonated);
+		return Objects.hash(donatedOn, donationId, donorId, canUse, unitsDonated);
 	}
 
 	@Override
@@ -117,7 +118,7 @@ public class Donation {
 			return false;
 		Donation other = (Donation) obj;
 		return Objects.equals(donatedOn, other.donatedOn) && Objects.equals(donationId, other.donationId)
-				&& Objects.equals(donorId, other.donorId) && Objects.equals(reusable, other.reusable)
+				&& Objects.equals(donorId, other.donorId) && Objects.equals(canUse, other.canUse)
 				&& Objects.equals(unitsDonated, other.unitsDonated);
 	}
 }

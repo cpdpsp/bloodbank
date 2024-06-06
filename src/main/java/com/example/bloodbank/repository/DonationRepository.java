@@ -30,7 +30,7 @@ public interface DonationRepository extends JpaRepository<Donation, UUID> {
 
 	@Transactional
 	@Modifying
-	@Query(value = "update donation set reusable=false where "
+	@Query(value = "update donation set can_use=false where "
 			+ "donated_on not between UNIX_TIMESTAMP(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) * 1000 and (:currentTime)", nativeQuery = true)
 	void updateBloodReusability(Long currentTime);
 }

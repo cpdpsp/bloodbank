@@ -65,7 +65,7 @@ public class DonationController {
 	}
 
 	@PatchMapping("/modifyDonation/{id}")
-	public ResponseEntity<Donation> patchDonation(@PathVariable(value = "id") UUID donationId,
+	public ResponseEntity<Donation> updateDonation(@PathVariable(value = "id") UUID donationId,
 			@RequestBody Donation donation) {
 		Donation donationSaved = donationService.validateAndSaveDonation(donationId, donation);
 		return new ResponseEntity<>(donationSaved, HttpStatus.OK);

@@ -168,7 +168,7 @@ public class DonationControllerTest {
 				.andExpect(jsonPath("$.unitsDonated").value(modifiedDonation.getUnitsDonated()))
 				.andExpect(jsonPath("$.donorId", equalTo(modifiedDonation.getDonorId().toString())))
 				.andExpect(jsonPath("$.donatedOn", is(donatedOn)))
-				.andExpect(jsonPath("$.reusable", is(modifiedDonation.isReusable())));
+				.andExpect(jsonPath("$.canUse", is(modifiedDonation.getCanUse())));
 	}
 
 	@Test
@@ -224,6 +224,6 @@ public class DonationControllerTest {
 				.andExpect(jsonPath("$.unitsDonated").value(modifiedDonation.getUnitsDonated()))
 				.andExpect(jsonPath("$.donorId", equalTo(modifiedDonation.getDonorId().toString())))
 				.andExpect(jsonPath("$.donatedOn", is(donatedOn)))
-				.andExpect(jsonPath("$.reusable", is(modifiedDonation.isReusable())));
+				.andExpect(jsonPath("$.canUse", is(modifiedDonation.getCanUse())));
 	}
 }
